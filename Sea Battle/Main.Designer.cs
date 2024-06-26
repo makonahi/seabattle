@@ -1,6 +1,6 @@
 ﻿namespace Sea_Battle
 {
-    partial class Form1
+    partial class Main
     {
         /// <summary>
         /// Обязательная переменная конструктора.
@@ -28,9 +28,12 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.YourFieldPBox = new System.Windows.Forms.PictureBox();
             this.CoordinatesPBox = new System.Windows.Forms.PictureBox();
             this.testLabel = new System.Windows.Forms.Label();
+            this.updaterTick = new System.Windows.Forms.Timer(this.components);
+            this.acceptPositionButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.YourFieldPBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.CoordinatesPBox)).BeginInit();
             this.SuspendLayout();
@@ -53,21 +56,40 @@
             // 
             // testLabel
             // 
-            this.testLabel.Location = new System.Drawing.Point(687, 212);
+            this.testLabel.Location = new System.Drawing.Point(488, 548);
             this.testLabel.Name = "testLabel";
-            this.testLabel.Size = new System.Drawing.Size(288, 290);
+            this.testLabel.Size = new System.Drawing.Size(209, 230);
             this.testLabel.TabIndex = 2;
             this.testLabel.Text = "0";
             // 
-            // Form1
+            // updaterTick
+            // 
+            this.updaterTick.Enabled = true;
+            this.updaterTick.Interval = 500;
+            this.updaterTick.Tick += new System.EventHandler(this.updaterTick_Tick);
+            // 
+            // acceptPositionButton
+            // 
+            this.acceptPositionButton.Enabled = false;
+            this.acceptPositionButton.Font = new System.Drawing.Font("Segoe UI", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.acceptPositionButton.Location = new System.Drawing.Point(166, 565);
+            this.acceptPositionButton.Name = "acceptPositionButton";
+            this.acceptPositionButton.Size = new System.Drawing.Size(182, 54);
+            this.acceptPositionButton.TabIndex = 3;
+            this.acceptPositionButton.Text = "Принять";
+            this.acceptPositionButton.UseVisualStyleBackColor = true;
+            this.acceptPositionButton.Click += new System.EventHandler(this.acceptPositionButton_Click);
+            // 
+            // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1407, 816);
+            this.Controls.Add(this.acceptPositionButton);
             this.Controls.Add(this.testLabel);
             this.Controls.Add(this.YourFieldPBox);
             this.Controls.Add(this.CoordinatesPBox);
-            this.Name = "Form1";
+            this.Name = "Main";
             this.Text = "Form1";
             this.Load += new System.EventHandler(this.Form1_Load);
             ((System.ComponentModel.ISupportInitialize)(this.YourFieldPBox)).EndInit();
@@ -77,9 +99,11 @@
         }
 
         #endregion
-        private System.Windows.Forms.PictureBox YourFieldPBox;
         private System.Windows.Forms.PictureBox CoordinatesPBox;
-        private System.Windows.Forms.Label testLabel;
+        public System.Windows.Forms.Label testLabel;
+        public System.Windows.Forms.PictureBox YourFieldPBox;
+        private System.Windows.Forms.Timer updaterTick;
+        private System.Windows.Forms.Button acceptPositionButton;
     }
 }
 
