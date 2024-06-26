@@ -10,6 +10,7 @@ using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Button;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.ProgressBar;
 
 namespace Sea_Battle
@@ -103,22 +104,28 @@ namespace Sea_Battle
             }
         }
 
+        private void RevertSize(DoubleBufferedPictureBox pBox)
+        {
+            pBox.Size = new Size(pBox.Height, pBox.Width);
+        }
         private void ShipsPBox_MouseMove(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Right) return;
             if (location == Point.Empty) return;
             DoubleBufferedPictureBox pBox = sender as DoubleBufferedPictureBox;
             Point relocation = pBox.Location;
-            if (CheckIfInField(pBox)&&!CheckIfProhibited(pBox, this.PointToClient(Cursor.Position)))
+            if (CheckIfInField(pBox))
             {
-                pBox.Tag = DRAGGING_OVER_FIELD;
+                if (CheckIfProhibited(pBox))
+                    pBox.Tag = DRAGGING_OVER_PROHIBITED;
+                else
+                    pBox.Tag = DRAGGING_OVER_FIELD;
                 relocation.X += e.X - location.X; relocation.X -= relocation.X % tilesize; relocation.X += 25 + offset*2;
                 relocation.Y += e.Y - location.Y; relocation.Y -= relocation.Y % tilesize; relocation.Y += 20 + offset*2;
             }
             else
             {
-                if ((int)pBox.Tag != DRAGGING_OVER_PROHIBITED)
-                    pBox.Tag = DRAGGING_OVER_FORM;
+                pBox.Tag = DRAGGING_OVER_FORM;
                 relocation.X += e.X - location.X;
                 relocation.Y += e.Y - location.Y;
             }
@@ -130,10 +137,16 @@ namespace Sea_Battle
             DoubleBufferedPictureBox pBox = sender as DoubleBufferedPictureBox;
             if (CheckIfInField(pBox) && e.Button == MouseButtons.Right)
             {
-                Size tsize = pBox.Size;
+                
                 FillOnField(pBox, TILE_EMPTY);
-                pBox.Width = (int)tsize.Height;
-                pBox.Height = (int)tsize.Width;
+                RevertSize(pBox);
+                if (CheckIfProhibited(pBox))
+                { 
+                    RevertSize(pBox);
+                    FillOnField(pBox, TILE_UNHARMED_SHIP);
+                    pBox.Tag = DRAGGING_OVER_FORM; 
+                    return; 
+                }
                 FillOnField(pBox, TILE_UNHARMED_SHIP);
                 update_testLabel();
                 pBox.Refresh();
@@ -159,8 +172,12 @@ namespace Sea_Battle
             pBox.Tag = DRAGGING_OVER_FORM;
             Refresh();
             location = Point.Empty;
-            if (!CheckIfInField(pBox)||CheckIfProhibited(pBox, this.PointToClient(Cursor.Position)))
+            if (!CheckIfInField(pBox)||CheckIfProhibited(pBox))
             {
+                pBox.Tag = DRAGGING_OVER_FORM;
+                if (pBox.Height>pBox.Width)
+                    pBox.Size=new Size(pBox.Height, pBox.Width);
+                Refresh();
                 pBox.Location = new Point(488, 145 + (4 - pBox.Width / 40) * 46);
             }
             else
@@ -177,17 +194,19 @@ namespace Sea_Battle
                 return true;
             return false;
         }
-        private bool CheckIfProhibited(object sender, Point cursorLoc)
+        private bool CheckIfProhibited(object sender)
         {
             DoubleBufferedPictureBox pBox = sender as DoubleBufferedPictureBox;
-            int tx = (cursorLoc.X - 65) / 40; int txp = (pBox.Location.X - 65) / 40;
-            int ty = (cursorLoc.Y - 140) / 40; int txy = (pBox.Location.Y - 140) / 40;
-            Debug.WriteLine(dictionary[tx + 1] + " " + (ty + 1).ToString());
-                for (int x = Math.Max(tx - 1, 0); x <= Math.Min(tx + pBox.Width / 40+1, 9); x++)
-                    for (int y = Math.Max(ty - 1, 0); y <= Math.Min(ty + (pBox.Height+1) / 40 + 1, 9); y++)
+            int txp = (pBox.Location.X - 65) / 40;
+            int txy = (pBox.Location.Y - 140) / 40;
+            int width = pBox.Width / 40 + 1;
+            int height = pBox.Height/ 40 + 1;
+            Debug.WriteLine(dictionary[txp + 1] + " " + (txy + 1).ToString()+ " " + width.ToString() + " " +
+                height.ToString());
+                for (int x = Math.Max(txp - 1, 0); x <= Math.Min(txp + width, 9); x++)
+                    for (int y = Math.Max(txy - 1, 0); y <= Math.Min(txy + height, 9); y++)
                         if (field[x, y] != 1)
                         {
-                            Debug.WriteLine(dictionary[x+1] +" "+(y+1).ToString());
                             pBox.Tag = DRAGGING_OVER_PROHIBITED;
                             return true;
                         }
