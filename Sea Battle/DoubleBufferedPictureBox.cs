@@ -26,6 +26,7 @@ namespace Sea_Battle
         const int DRAGGING_OVER_FORM = Constants.DRAGGING_OVER_FORM;
         const int DRAGGING_OVER_FIELD = Constants.DRAGGING_OVER_FIELD;
         const int DRAGGING_OVER_PROHIBITED = Constants.DRAGGING_OVER_PROHIBITED;
+        const int IDLE_ON_FIELD = Constants.IDLE_ON_FIELD;
 
         /// <summary>
         /// Импорт переменных из других классов.
@@ -98,6 +99,7 @@ namespace Sea_Battle
                 FillOnField(pBox, TILE_UNHARMED_SHIP);
                 pBox.Refresh();
             }
+            Main.CheckButtonLock();
         }
 
         private void ShipsPBox_MouseDown(object sender, MouseEventArgs e)
@@ -107,13 +109,14 @@ namespace Sea_Battle
             if (e.Button == MouseButtons.Left) location = new Point(e.X, e.Y);
             if (e.Button == MouseButtons.Left && CheckIfInField(pBox))
                 FillOnField(pBox, TILE_EMPTY);
+            Main.CheckButtonLock();
         }
 
         private void ShipsPbox_MouseUp(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Right) return;
             DoubleBufferedPictureBox pBox = sender as DoubleBufferedPictureBox;
-            pBox.Tag = DRAGGING_OVER_FORM;
+            pBox.Tag = IDLE_ON_FIELD;
             Refresh();
             location = Point.Empty;
             if (!CheckIfInField(pBox) || CheckIfProhibited(pBox))
@@ -122,12 +125,13 @@ namespace Sea_Battle
                 if (pBox.Height > pBox.Width)
                     pBox.Size = new Size(pBox.Height, pBox.Width);
                 Refresh();
-                pBox.Location = new Point(488, 145 + (4 - pBox.Width / 40) * 46);
+                pBox.Location = new Point(488, 145 + (4 - pBox.Width / tilesize) * 46);
             }
             else
             {
                 FillOnField(pBox, TILE_UNHARMED_SHIP);
             }
+            Main.CheckButtonLock();
         }
         private bool CheckIfInField(DoubleBufferedPictureBox pBox)
         {
@@ -139,10 +143,10 @@ namespace Sea_Battle
         private bool CheckIfProhibited(object sender)
         {
             DoubleBufferedPictureBox pBox = sender as DoubleBufferedPictureBox;
-            int txp = (pBox.Location.X - 65) / 40;
-            int txy = (pBox.Location.Y - 140) / 40;
-            int width = pBox.Width / 40 + 1;
-            int height = pBox.Height / 40 + 1;
+            int txp = (pBox.Location.X - left) / tilesize;
+            int txy = (pBox.Location.Y - top) / tilesize;
+            int width = pBox.Width / tilesize + 1;
+            int height = pBox.Height / tilesize + 1;
             for (int x = Math.Max(txp - 1, 0); x <= Math.Min(txp + width, 9); x++)
                 for (int y = Math.Max(txy - 1, 0); y <= Math.Min(txy + height, 9); y++)
                     if (Main.field[x, y] != 1)
@@ -155,13 +159,13 @@ namespace Sea_Battle
         private void FillOnField(object sender, int filler)
         {
             DoubleBufferedPictureBox pBox = sender as DoubleBufferedPictureBox;
-            int tx = (pBox.Location.X - left) / 40;
-            int ty = (pBox.Location.Y - top) / 40;
+            int tx = (pBox.Location.X - left) / tilesize;
+            int ty = (pBox.Location.Y - top) / tilesize;
             if (pBox.Width >= pBox.Height)
-                for (int i = 0; i <= pBox.Width / 40; i++)
+                for (int i = 0; i <= pBox.Width / tilesize; i++)
                     Main.field[tx + i, ty] = filler;
             else
-                for (int i = 0; i <= pBox.Height / 40; i++)
+                for (int i = 0; i <= pBox.Height / tilesize; i++)
                     Main.field[tx, ty + i] = filler;
         }
 
@@ -173,6 +177,7 @@ namespace Sea_Battle
                 int halfThickness = thickness / 2;
                 Pen p = new Pen(Color.Black); switch (pBox.Tag)
                 {
+                    case IDLE_ON_FIELD:
                     case DRAGGING_OVER_FORM:
                         p = new Pen(Color.Blue, thickness);
                         break;

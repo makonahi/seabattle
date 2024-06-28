@@ -10,6 +10,7 @@ using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Button;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.ProgressBar;
 
@@ -31,6 +32,7 @@ namespace Sea_Battle
         const int DRAGGING_OVER_FORM = Constants.DRAGGING_OVER_FORM;
         const int DRAGGING_OVER_FIELD = Constants.DRAGGING_OVER_FIELD;
         const int DRAGGING_OVER_PROHIBITED = Constants.DRAGGING_OVER_PROHIBITED;
+        const int IDLE_ON_FIELD = Constants.IDLE_ON_FIELD;
 
         Pen ShipPen = new Pen(Color.Blue, 3);
         SolidBrush ShipBrush = new SolidBrush(SystemColors.Control);
@@ -40,39 +42,34 @@ namespace Sea_Battle
         Graphics g, c;
 
         Ship[] ships = new Ship[10];
-        DoubleBufferedPictureBox[] shipsPictureBoxes = new DoubleBufferedPictureBox[10];
+        static DoubleBufferedPictureBox[] shipsPictureBoxes = new DoubleBufferedPictureBox[10];
 
         public static int[,] field = new int[10, 10];
 
         public static int left, right, bottom, top;
 
-        private void updaterTick_Tick(object sender, EventArgs e)
-        {
-            update_testLabel();
-        }
+        public static System.Windows.Forms.Button acceptButton;
 
-        private void acceptPositionButton_Click(object sender, EventArgs e)
-        {
-            for (int j = 0; j < 10; j++)
-            {
-                Rectangle shipRect = new Rectangle(shipsPictureBoxes[j].Location.X - left+offset,
-                    shipsPictureBoxes[j].Location.Y - top+ offset, shipsPictureBoxes[j].Width-offset*3,
-                    shipsPictureBoxes[j].Height - offset*3);
-                g.FillRectangle(ShipBrush, shipRect);
-                g.DrawRectangle(ShipPen, shipRect);
-                shipsPictureBoxes[j].Dispose();
-                shipsPictureBoxes[j] = null;
-            }
-            YourFieldPBox.Image = map;
-            acceptPositionButton.Dispose();
-            Refresh();
-        }
-
-        Font font = new Font(
+        Font h1 = new Font(
            "Times New Roman",
            24,
            FontStyle.Regular,
            GraphicsUnit.Pixel);
+        Font h2 = new Font(
+           "Microsoft Sans Serif",
+           16,
+           FontStyle.Regular,
+           GraphicsUnit.Pixel);
+
+        /// <summary>
+        /// TEST
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void updaterTick_Tick(object sender, EventArgs e)
+        {
+            update_testLabel();
+        }
 
         public Main()
         {
@@ -95,8 +92,8 @@ namespace Sea_Battle
             c.TextRenderingHint = TextRenderingHint.AntiAlias;
             for (int i=1;i<=10;i++)
             {
-                c.DrawString(dictionary[i].ToString(), font,brush,i * 40+10, 10);
-                c.DrawString(i.ToString(), font,brush,15-(i/10)*5, i * 40 + 10);
+                c.DrawString(dictionary[i].ToString(), h1,brush,i * 40+10, 10);
+                c.DrawString(i.ToString(), h1,brush,15-(i/10)*5, i * 40 + 10);
             }
             CoordinatesPBox.Image = coordinates;
             for (int i = 0; i < 4; i++) { CreateShips(4 - i, tcounter); tcounter += (4 - i); }
@@ -109,6 +106,18 @@ namespace Sea_Battle
                 g.DrawLine(pen, offset, y * tilesize + offset, 
                     YourFieldPBox.Height - offset, y * tilesize + offset); }
             YourFieldPBox.Image = map;
+            acceptButton = new System.Windows.Forms.Button
+            {
+                Location = new Point(166, 565),
+                Size = new Size(222, 44),
+                Text = "Принять",
+                Font = h1,
+                Enabled = false,
+            };
+            acceptButton.MouseDown += new MouseEventHandler(this.acceptButton_Click);
+            Controls.Add(acceptButton);
+            hintLabel.Font = h2;
+            hintLabel.Text = "Перетаскивайте корабли на поле.\nКак определитесь с расстановкой, нажмите \"Принять\".";
         }
 
         private void CreateShips(int count, int startingPoint)
@@ -123,14 +132,32 @@ namespace Sea_Battle
                 ships[i] = new Ship(5-count, shipsPictureBoxes[i]);
             }
         }
-        public void CheckButtonLock()
+        public static void CheckButtonLock()
         {
             int counter = 0;
             for (int i = 0; i < 10; i++)
-                if ((int)shipsPictureBoxes[i].Tag == DRAGGING_OVER_FIELD)
+                if ((int)shipsPictureBoxes[i].Tag == IDLE_ON_FIELD)
                     counter++;
+            Debug.WriteLine(counter);
             if (counter == 10)
-                acceptPositionButton.Enabled = !acceptPositionButton.Enabled;
+                acceptButton.Enabled = !acceptButton.Enabled;
+        }
+        private void acceptButton_Click(object sender, EventArgs e)
+        {
+            for (int j = 0; j < 10; j++)
+            {
+                Rectangle shipRect = new Rectangle(shipsPictureBoxes[j].Location.X - left + offset,
+                    shipsPictureBoxes[j].Location.Y - top + offset, shipsPictureBoxes[j].Width - offset * 3,
+                    shipsPictureBoxes[j].Height - offset * 3);
+                g.FillRectangle(ShipBrush, shipRect);
+                g.DrawRectangle(ShipPen, shipRect);
+                shipsPictureBoxes[j].Dispose();
+                shipsPictureBoxes[j] = null;
+            }
+            YourFieldPBox.Image = map;
+            acceptButton.Dispose();
+            hintLabel.Dispose();
+            Refresh();
         }
         /// <summary>
         /// TEST

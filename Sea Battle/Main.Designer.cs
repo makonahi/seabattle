@@ -33,7 +33,7 @@
             this.CoordinatesPBox = new System.Windows.Forms.PictureBox();
             this.testLabel = new System.Windows.Forms.Label();
             this.updaterTick = new System.Windows.Forms.Timer(this.components);
-            this.acceptPositionButton = new System.Windows.Forms.Button();
+            this.hintLabel = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.YourFieldPBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.CoordinatesPBox)).BeginInit();
             this.SuspendLayout();
@@ -68,24 +68,21 @@
             this.updaterTick.Interval = 500;
             this.updaterTick.Tick += new System.EventHandler(this.updaterTick_Tick);
             // 
-            // acceptPositionButton
+            // hintLabel
             // 
-            this.acceptPositionButton.Enabled = false;
-            this.acceptPositionButton.Font = new System.Drawing.Font("Segoe UI", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.acceptPositionButton.Location = new System.Drawing.Point(166, 565);
-            this.acceptPositionButton.Name = "acceptPositionButton";
-            this.acceptPositionButton.Size = new System.Drawing.Size(182, 54);
-            this.acceptPositionButton.TabIndex = 3;
-            this.acceptPositionButton.Text = "Принять";
-            this.acceptPositionButton.UseVisualStyleBackColor = true;
-            this.acceptPositionButton.Click += new System.EventHandler(this.acceptPositionButton_Click);
+            this.hintLabel.ForeColor = System.Drawing.SystemColors.ControlDark;
+            this.hintLabel.Location = new System.Drawing.Point(25, 48);
+            this.hintLabel.Name = "hintLabel";
+            this.hintLabel.Size = new System.Drawing.Size(524, 49);
+            this.hintLabel.TabIndex = 3;
+            this.hintLabel.Text = "label1";
             // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1407, 816);
-            this.Controls.Add(this.acceptPositionButton);
+            this.Controls.Add(this.hintLabel);
             this.Controls.Add(this.testLabel);
             this.Controls.Add(this.YourFieldPBox);
             this.Controls.Add(this.CoordinatesPBox);
@@ -103,7 +100,7 @@
         public System.Windows.Forms.Label testLabel;
         public System.Windows.Forms.PictureBox YourFieldPBox;
         private System.Windows.Forms.Timer updaterTick;
-        private System.Windows.Forms.Button acceptPositionButton;
+        private System.Windows.Forms.Label hintLabel;
     }
 }
 

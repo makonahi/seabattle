@@ -38,5 +38,6 @@ namespace Sea_Battle
         public const int DRAGGING_OVER_FORM = 0;
         public const int DRAGGING_OVER_FIELD = 1;
         public const int DRAGGING_OVER_PROHIBITED = 2;
+        public const int IDLE_ON_FIELD = 3;
     }
 }
