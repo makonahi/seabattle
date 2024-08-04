@@ -12,25 +12,23 @@ namespace Sea_Battle
 {
     public class DoubleBufferedPictureBox : PictureBox
     {
-        const int TILE_UNKOWN = Constants.TILE_UNKOWN;
-        const int TILE_EMPTY = Constants.TILE_EMPTY;
-        const int TILE_UNHARMED_SHIP = Constants.TILE_UNHARMED_SHIP;
-        const int TILE_HARMED_SHIP = Constants.TILE_HARMED_SHIP;
-        const int TILE_SUNKEN_SHIP = Constants.TILE_SUNKEN_SHIP;
-        const int TILE_SUNKEN_SHIP_SURROUNDINGS = Constants.TILE_SUNKEN_SHIP_SURROUNDINGS;
+        const int TILE_UNKOWN = (int)Constants.tileState.TILE_UNKOWN;
+        const int TILE_EMPTY = (int)Constants.tileState.TILE_EMPTY;
+        const int TILE_UNHARMED_SHIP = (int)Constants.tileState.TILE_UNHARMED_SHIP;
+        const int TILE_HARMED_SHIP = (int)Constants.tileState.TILE_HARMED_SHIP;
+        const int TILE_SUNKEN_SHIP = (int)Constants.tileState.TILE_SUNKEN_SHIP;
+        const int TILE_SUNKEN_SHIP_SURROUNDINGS = (int)Constants.tileState.TILE_SUNKEN_SHIP_SURROUNDINGS;
 
         const int tilesize = Constants.tilesize;
         const string dictionary = Constants.dictionary;
         const int offset = Constants.offset;
+        const int coordinatesOffset = Constants.coordinatesOffset;
 
-        const int DRAGGING_OVER_FORM = Constants.DRAGGING_OVER_FORM;
-        const int DRAGGING_OVER_FIELD = Constants.DRAGGING_OVER_FIELD;
-        const int DRAGGING_OVER_PROHIBITED = Constants.DRAGGING_OVER_PROHIBITED;
-        const int IDLE_ON_FIELD = Constants.IDLE_ON_FIELD;
+        const int DRAGGING_OVER_FORM = (int)Constants.pBoxState.DRAGGING_OVER_FORM;
+        const int DRAGGING_OVER_FIELD = (int)Constants.pBoxState.DRAGGING_OVER_FIELD;
+        const int DRAGGING_OVER_PROHIBITED = (int)Constants.pBoxState.DRAGGING_OVER_PROHIBITED;
+        const int IDLE_ON_FIELD = (int)Constants.pBoxState.IDLE_ON_FIELD;
 
-        /// <summary>
-        /// Импорт переменных из других классов.
-        /// </summary>
         static int left = Main.left;
         static int right = Main.right;
         static int top = Main.top;
@@ -69,8 +67,8 @@ namespace Sea_Battle
                     pBox.Tag = DRAGGING_OVER_PROHIBITED;
                 else
                     pBox.Tag = DRAGGING_OVER_FIELD;
-                relocation.X += e.X - location.X; relocation.X -= relocation.X % tilesize; relocation.X += 25 + offset * 2;
-                relocation.Y += e.Y - location.Y; relocation.Y -= relocation.Y % tilesize; relocation.Y += 20 + offset * 2;
+                relocation.X += e.X - location.X; relocation.X -= relocation.X % tilesize; relocation.X += 30;
+                relocation.Y += e.Y - location.Y; relocation.Y -= relocation.Y % tilesize; relocation.Y += 22;
             }
             else
             {
@@ -135,21 +133,21 @@ namespace Sea_Battle
         }
         private bool CheckIfInField(DoubleBufferedPictureBox pBox)
         {
-            if ((pBox.Left > left && pBox.Right < right)
-                && (pBox.Top > top && pBox.Bottom < bottom))
+            if ((pBox.Left > left + coordinatesOffset && pBox.Right < right)
+                && (pBox.Top > top + coordinatesOffset && pBox.Bottom < bottom))
                 return true;
             return false;
         }
         private bool CheckIfProhibited(object sender)
         {
             DoubleBufferedPictureBox pBox = sender as DoubleBufferedPictureBox;
-            int txp = (pBox.Location.X - left) / tilesize;
-            int txy = (pBox.Location.Y - top) / tilesize;
+            int txp = (pBox.Location.X - left - coordinatesOffset) / tilesize;
+            int txy = (pBox.Location.Y - top - coordinatesOffset) / tilesize;
             int width = pBox.Width / tilesize + 1;
             int height = pBox.Height / tilesize + 1;
             for (int x = Math.Max(txp - 1, 0); x <= Math.Min(txp + width, 9); x++)
                 for (int y = Math.Max(txy - 1, 0); y <= Math.Min(txy + height, 9); y++)
-                    if (Main.field[x, y] != 1)
+                    if (Main.Fields_Values[0][x, y] != 1)
                     {
                         pBox.Tag = DRAGGING_OVER_PROHIBITED;
                         return true;
@@ -159,14 +157,14 @@ namespace Sea_Battle
         private void FillOnField(object sender, int filler)
         {
             DoubleBufferedPictureBox pBox = sender as DoubleBufferedPictureBox;
-            int tx = (pBox.Location.X - left) / tilesize;
-            int ty = (pBox.Location.Y - top) / tilesize;
+            int tx = (pBox.Location.X - left - coordinatesOffset) / tilesize;
+            int ty = (pBox.Location.Y - top - coordinatesOffset) / tilesize;
             if (pBox.Width >= pBox.Height)
                 for (int i = 0; i <= pBox.Width / tilesize; i++)
-                    Main.field[tx + i, ty] = filler;
+                    Main.Fields_Values[0][tx + i, ty] = filler;
             else
                 for (int i = 0; i <= pBox.Height / tilesize; i++)
-                    Main.field[tx, ty + i] = filler;
+                    Main.Fields_Values[0][tx, ty + i] = filler;
         }
 
         private void ShipOutline_Paint(object sender, PaintEventArgs e)
